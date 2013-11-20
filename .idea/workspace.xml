@@ -2,16 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="55efc560-7c5d-4214-bca3-c4c983c53f44" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/build.sbt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/scala/scalabot.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE" afterPath="$PROJECT_DIR$/LICENSE" />
     </list>
     <ignored path="scalabot.iws" />
     <ignored path=".idea/workspace.xml" />
     <file path="/Dummy.txt" changelist="55efc560-7c5d-4214-bca3-c4c983c53f44" time="1384990957261" ignored="false" />
     <file path="/main.scala" changelist="55efc560-7c5d-4214-bca3-c4c983c53f44" time="1384991670726" ignored="false" />
-    <file path="$PROJECT_DIR$/../scala-hello-world/.idea/workspace.xml" changelist="55efc560-7c5d-4214-bca3-c4c983c53f44" time="1384991814920" ignored="false" />
+    <file path="$PROJECT_DIR$/../scala-hello-world/.idea/workspace.xml" changelist="55efc560-7c5d-4214-bca3-c4c983c53f44" time="1384991960560" ignored="false" />
     <file path="/SBT" changelist="55efc560-7c5d-4214-bca3-c4c983c53f44" time="1384991511615" ignored="false" />
     <file path="/fragment.java" changelist="55efc560-7c5d-4214-bca3-c4c983c53f44" time="1384991626011" ignored="false" />
+    <file path="/LICENSE" changelist="55efc560-7c5d-4214-bca3-c4c983c53f44" time="1384991955170" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,13 +71,22 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="scalabot.scala" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="scalabot.scala" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/scalabot.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="4" selection-start="190" selection-end="190" vertical-scroll-proportion="0.3846154">
+            <state line="12" column="4" selection-start="190" selection-end="190" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="e#18#43#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LICENSE" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/LICENSE">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -113,6 +122,7 @@
         <option value="$PROJECT_DIR$/main/scala/main.scala" />
         <option value="$PROJECT_DIR$/main/scala/scalabot.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/scalabot.scala" />
+        <option value="$PROJECT_DIR$/LICENSE" />
       </list>
     </option>
   </component>
@@ -312,9 +322,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="5" y="22" width="1420" height="860" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
-      <window_info id="Changes" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32972974" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32972974" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="SBT Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32972974" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -407,10 +417,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/scalabot.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="4" selection-start="190" selection-end="190" vertical-scroll-proportion="0.3846154">
+        <state line="12" column="4" selection-start="190" selection-end="190" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="e#18#43#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LICENSE">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
         </state>
       </provider>
     </entry>
