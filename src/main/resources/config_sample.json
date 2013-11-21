@@ -1,0 +1,20 @@
+{
+  "configVersion": 0.1,
+  "adminPassword": "foobar",
+  "networks": [
+    {
+      "name": "freenode",
+      "servers" [
+        "irc.freenode.net"
+      ],
+      "nick": "scalabot",
+      "altNick": "scalabot_",
+      "channels": [
+        "#scalabot"
+      ],
+      "performs": [
+        "/msg nickserv identify scalabot test1234"
+      ]
+    }
+  ]
+}
