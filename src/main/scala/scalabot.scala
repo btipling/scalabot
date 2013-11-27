@@ -18,6 +18,5 @@ object Scalabot extends App {
   val system = ActorSystem("IRC")
   val irclistener = system.actorOf(Props[listener.IRCListener], name = "irclistener")
   Pretty.blue(s"listener is $irclistener")
-  system.shutdown
 }
 
