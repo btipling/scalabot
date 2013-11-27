@@ -18,5 +18,7 @@ object Scalabot extends App {
   val system = ActorSystem("IRC")
   val irclistener = system.actorOf(Props[listener.IRCListener], name = "irclistener")
   Pretty.blue(s"listener is $irclistener")
+  val conn = system.actorOf(connection.Client.props(address, irclistener))
+  Pretty.blue(s"conn is $conn")
 }
 
