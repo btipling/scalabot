@@ -38,7 +38,9 @@ class Connection(remote: InetSocketAddress, listener: ActorRef) extends Actor {
       val connection = sender
       connection ! Register(self)
       context become {
-        case data: ByteString => connection ! Write(data)
+        case data: ByteString => {
+          connection ! Write(data)
+        }
         case CommandFailed(w: Write) => Pretty.red(s"Write to $host failed")
         case Received(data) => {
           listener ! data
