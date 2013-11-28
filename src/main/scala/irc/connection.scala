@@ -22,7 +22,6 @@ class IRCConnection(remote: InetSocketAddress, listener: ActorRef) extends Actor
   import Tcp._
   implicit val system = context.system
 
-
   val manager = IO(Tcp)
 
   manager ! Connect(remote)
