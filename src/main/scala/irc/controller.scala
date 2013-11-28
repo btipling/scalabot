@@ -2,12 +2,8 @@ package scalabot
 
 package irc
 
-package controller
-
 import scalabot.config
 import scalabot.pretty.Pretty
-import scalabot.irc.connection
-import scalabot.irc.listener
 
 import scala.collection.mutable
 import java.net.InetSocketAddress
@@ -17,7 +13,7 @@ import akka.actor.ActorSystem
 import akka.actor.Props
 
 
-class IRCController extends Actor {
+class Controller extends Actor {
   private val connections : mutable.Map[Int, ConnectionState] = mutable.Map.empty[Int, ConnectionState]
   private var idGenerator : Int = 0
   class ConnectionState (
@@ -33,16 +29,16 @@ class IRCController extends Actor {
       val (ircListener, ircConnection) = createConnection(network)
       bindConnection(ircListener, ircConnection, network)
     }
-    case _ => Pretty.yellow("IRCController got something unexpected.")
+    case _ => Pretty.yellow("Controller got something unexpected.")
   }
   def createConnection(network : config.Config.Network) = {
     val server = network.servers(0)
     val address = new InetSocketAddress(server.host, server.port)
     Pretty.blue(s"Connecting to $address")
-    val ircListener = context.actorOf(Props[listener.IRCListener],
+    val ircListener = context.actorOf(Props[Listener],
       name = "ircListener")
     ircListener ! network
-    val ircConnection = context.actorOf(connection.IRCConnection.props(address,
+    val ircConnection = context.actorOf(Connection.props(address,
       ircListener), name = "ircConnection")
     (ircListener, ircConnection)
   }

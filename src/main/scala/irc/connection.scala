@@ -2,8 +2,6 @@ package scalabot
 
 package irc
 
-package connection
-
 import scalabot.pretty.Pretty
 
 import akka.actor.{ Actor, ActorRef, Props }
@@ -12,12 +10,12 @@ import akka.util.ByteString
 import java.net.InetSocketAddress
 
 
-object IRCConnection {
+object Connection {
   def props(remote: InetSocketAddress, replies: ActorRef) =
-    Props(classOf[IRCConnection], remote, replies)
+    Props(classOf[Connection], remote, replies)
 }
 
-class IRCConnection(remote: InetSocketAddress, listener: ActorRef) extends Actor {
+class Connection(remote: InetSocketAddress, listener: ActorRef) extends Actor {
 
   import Tcp._
   implicit val system = context.system
