@@ -14,9 +14,7 @@ class IRCListener extends Actor {
     case "failed" => Pretty.red("IRC connection failed.")
     case "ByteString" => Pretty.green("Got a bytestring or something")
     case wtf:ByteString => {
-      Pretty.yellow(s"Nfi what just happened $wtf")
-      val wtf2: ByteString = wtf
-      val yo = wtf2.utf8String
+      val yo = wtf.utf8String
       Pretty.green(s"got: $yo")
     }
   }

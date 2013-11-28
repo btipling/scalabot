@@ -8,11 +8,15 @@ import scala.io.Source
 import scalabot.pretty.Pretty
 
 object Config {
+  case class Server (
+    host: String,
+    port: Int
+  )
   case class Network (
     name: String,
-    servers: Array[String],
     nick: String,
     altNick: String,
+    servers: Array[Server],
     channels: Array[String],
     performs: Array[String]
   )
@@ -48,13 +52,23 @@ object Config {
     Pretty.blue(s"Using config: $prettyJson")
     val config = configJson.obj.get
     val networksData = config.toMap("networks").array.get
+    Pretty.red(s"wtf: $networksData")
     var networks : List[Network] = List()
     for (data <- networksData) {
       val networkData = data.obj.get
+      val serversData = networkData("servers").get.array.get
+      var servers : List[Server] = List()
+      for (serverData <- serversData) {
+        val sobj : argonaut.JsonObject = serverData.obj.get
+        servers ::= new Server(
+          host = sobj("host").get.string.get,
+          port = sobj("port").get.number.get.toInt
+        )
+      }
       networks ::= new Network(
         name = jsString(networkData, "name"),
         nick = jsString(networkData, "nick"),
-        servers = jsArray(networkData, "servers"),
+        servers = servers.toArray,
         altNick = jsString(networkData, "altNick"),
         channels = jsArray(networkData, "channels"),
         performs = jsArray(networkData, "performs")

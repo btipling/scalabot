@@ -5,7 +5,10 @@
     {
       "name": "freenode",
       "servers": [
-        "irc.freenode.net"
+        {
+          "host": "irc.freenode.net",
+          "port": 6667
+        }
       ],
       "nick": "scalabot",
       "altNick": "scalabot_",
@@ -18,4 +21,5 @@
     }
   ]
 }
+
 
