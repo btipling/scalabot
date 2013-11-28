@@ -5,6 +5,7 @@ package irc
 package listener
 
 import scalabot.pretty.Pretty
+import scalabot.config
 
 import akka.actor.Actor
 import akka.actor.ActorRef
@@ -14,9 +15,11 @@ import akka.util.ByteString
 class IRCListener extends Actor {
   private var connection : ActorRef = _
   private var leftOver : String = ""
+  private var networkConfig : config.Config.Network = _
   def receive = {
     case "failed" => Pretty.red("IRC connection failed.")
-    case buffer:ByteString => handleBuffer(buffer.utf8String)
+    case buffer : ByteString => handleBuffer(buffer.utf8String)
+    case conf : config.Config.Network => networkConfig = conf
   }
   def handleBuffer(buffer: String) {
     if (buffer.isEmpty) {
