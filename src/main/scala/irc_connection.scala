@@ -4,18 +4,20 @@ package irc
 
 package connection
 
+import scalabot.pretty.Pretty
+
 import akka.actor.{ Actor, ActorRef, Props }
 import akka.io.{ IO, Tcp }
 import akka.util.ByteString
 import java.net.InetSocketAddress
 
 
-object Client {
+object IRCConnection {
   def props(remote: InetSocketAddress, replies: ActorRef) =
-    Props(classOf[Client], remote, replies)
+    Props(classOf[IRCConnection], remote, replies)
 }
 
-class Client(remote: InetSocketAddress, listener: ActorRef) extends Actor {
+class IRCConnection(remote: InetSocketAddress, listener: ActorRef) extends Actor {
 
   import Tcp._
   implicit val system = context.system
@@ -27,24 +29,31 @@ class Client(remote: InetSocketAddress, listener: ActorRef) extends Actor {
 
   def receive = {
     case CommandFailed(_: Connect) =>
-      println("Connection failed")
+      val host = remote.toString
+      Pretty.red(s"Connection to $host failed.")
       listener ! "failed"
       context stop self
 
     case c @ Connected(remote, local) =>
-      println("Connection connected")
+      val host = remote.toString
+      Pretty.green(s"Connected to $host.")
       listener ! c
       val connection = sender
       connection ! Register(self)
       context become {
         case data: ByteString => connection ! Write(data)
-        case CommandFailed(w: Write) => // O/S buffer was full
+        case CommandFailed(w: Write) => Pretty.red(s"Write to $host failed")
         case Received(data) => {
-          println("received some stuff")
           listener ! data
         }
-        case "close" => connection ! Close
-        case _: ConnectionClosed => context stop self
+        case "close" => {
+          Pretty.yellow(s"Closed conection to $host.")
+          connection ! Close
+        }
+        case _: ConnectionClosed => {
+          Pretty.yellow(s"Closed conection to $host.")
+          context stop self
+        }
       }
   }
 }

@@ -16,6 +16,7 @@ object Config {
     name: String,
     nick: String,
     altNick: String,
+    adminPassword: String,
     servers: Array[Server],
     channels: Array[String],
     performs: Array[String]
@@ -44,15 +45,15 @@ object Config {
     val rawConfig = source.mkString
     val configResult = JsonParser.parse(rawConfig)
     if (configResult.isLeft) {
-      printf("Invalid JSON config %s\n", configResult.toString)
+      Pretty.red(s"Invalid JSON config $configResult")
       System.exit(1)
     }
     val configJson = configResult.toOption.get
     val prettyJson = configJson.spaces2
     Pretty.blue(s"Using config: $prettyJson")
     val config = configJson.obj.get
+    val adminPassword = jsString(config, "adminPassword")
     val networksData = config.toMap("networks").array.get
-    Pretty.red(s"wtf: $networksData")
     var networks : List[Network] = List()
     for (data <- networksData) {
       val networkData = data.obj.get
@@ -68,15 +69,16 @@ object Config {
       networks ::= new Network(
         name = jsString(networkData, "name"),
         nick = jsString(networkData, "nick"),
-        servers = servers.toArray,
         altNick = jsString(networkData, "altNick"),
+        adminPassword = adminPassword,
+        servers = servers.toArray,
         channels = jsArray(networkData, "channels"),
         performs = jsArray(networkData, "performs")
       )
     }
     new Config(
       configVersion = jsNumber(config, "configVersion"),
-      adminPassword = jsString(config, "adminPassword"),
+      adminPassword = adminPassword,
       networks = networks.toArray
     )
   }
