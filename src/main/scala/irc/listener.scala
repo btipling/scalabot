@@ -32,22 +32,23 @@ class Listener extends Actor {
     }
     val lines = buffer.split("\n")
     if (hasLeftOver) {
-      handleNextLine(lines, 0, buffer.length - 1)
+      handleNextLine(lines, 0, lines.length - 1)
       leftOver = lines.last
       Pretty.magenta("Got a partial string")
     } else {
-      handleNextLine(lines, 0, buffer.length)
+      handleNextLine(lines, 0, lines.length)
     }
   }
   def handleNextLine(lines : Array[String], index : Int, length : Int) {
-    if (lines.length == index) {
+    if (length == index) {
       return
     }
+    val line = lines(index)
     if (leftOver.isEmpty) {
-      processLine(lines(index))
+      processLine(line)
     } else {
       Pretty.magenta("Handling a partial string")
-      processLine(leftOver + lines(index))
+      processLine(leftOver + line)
       leftOver = ""
     }
     handleNextLine(lines, index + 1, length)
