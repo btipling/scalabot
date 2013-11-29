@@ -6,41 +6,39 @@ import scalabot.config
 import scalabot.pretty.Pretty
 
 import akka.actor.ActorRef
-import akka.util.ByteString
 
 object Handler {
-  class OutgoingMessage (action : String, key : String, value : String = "") {
-    override def toString : String = {
-      if (value.isEmpty) {
-        s"$action $key \r\n"
-      } else {
-        s"$action $key : $value \r\n"
-      }
-    }
-    def toByteString : ByteString = {
-      ByteString(this.toString)
-    }
-  }
   def handle(line : String, sender: ActorRef, networkConfig : config.Config.Network,
     networkState : NetworkState) {
     if (line.isEmpty) {
       return
     }
     if (!networkState.connected) {
-      send(sender, new OutgoingMessage("NICK", networkConfig.nick))
-      send(sender, new OutgoingMessage("User", "scalabot 8 *", "scalabot"))
+      Utils.send(sender, new Utils.OutgoingMessage("NICK", networkConfig.nick))
+      Utils.send(sender, new Utils.OutgoingMessage("User", "scalabot 8 *", "scalabot"))
       networkState.connected = true
     }
     val m = Message.getMessage(line)
     m match {
       case ping : Message.PingMessage => {
-        send(sender, new OutgoingMessage("PONG", ping.host))
+        Utils.send(sender, new Utils.OutgoingMessage("PONG", ping.host))
+      }
+      case serverMessage: Message.ServerMessage => {
+        if (networkState.joined) {
+          return
+        }
+        if (serverMessage.id < 10) {
+          return
+        }
+        if (!networkConfig.channels.isEmpty) {
+          Utils.send(sender, Utils.joinChannelsMessage(networkConfig.channels))
+        }
+        for (p <- networkConfig.performs) {
+          Utils.send(sender, new Utils.OutgoingMessage(p.action, p.target, p.message))
+        }
+        networkState.joined = true
       }
       case _ => {}
     }
-  }
-  def send(sender: ActorRef, message : OutgoingMessage) {
-    Pretty.cyan(message.toString)
-    sender ! message.toByteString
   }
 }

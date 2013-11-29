@@ -12,6 +12,11 @@ object Config {
     host: String,
     port: Int
   )
+  case class Perform (
+    action: String,
+    target: String,
+    message: String
+  )
   case class Network (
     name: String,
     nick: String,
@@ -19,7 +24,7 @@ object Config {
     adminPassword: String,
     servers: Array[Server],
     channels: Array[String],
-    performs: Array[String]
+    performs: Array[Perform]
   )
   case class Config (
     configVersion: Double,
@@ -57,6 +62,7 @@ object Config {
     var networks : List[Network] = List()
     for (data <- networksData) {
       val networkData = data.obj.get
+
       val serversData = networkData("servers").get.array.get
       var servers : List[Server] = List()
       for (serverData <- serversData) {
@@ -66,6 +72,18 @@ object Config {
           port = sobj("port").get.number.get.toInt
         )
       }
+
+      val performsData = networkData("performs").get.array.get
+      var performs : List[Perform] = List()
+      for (performData <- performsData) {
+        val pobj : argonaut.JsonObject = performData.obj.get
+        performs ::= new Perform(
+          action = pobj("action").get.string.get,
+          target = pobj("target").get.string.get,
+          message = pobj("message").get.string.get
+        )
+      }
+
       networks ::= new Network(
         name = jsString(networkData, "name"),
         nick = jsString(networkData, "nick"),
@@ -73,7 +91,7 @@ object Config {
         adminPassword = adminPassword,
         servers = servers.toArray,
         channels = jsArray(networkData, "channels"),
-        performs = jsArray(networkData, "performs")
+        performs = performs.toArray
       )
     }
     new Config(

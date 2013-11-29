@@ -20,7 +20,7 @@ class Listener extends Actor {
     case buffer : ByteString => handleBuffer(buffer.utf8String)
     case conf : config.Config.Network => networkConfig = conf
   }
-  def handleBuffer(buffer: String) {
+  def handleBuffer (buffer: String) {
     if (buffer.isEmpty) {
       return
     }
@@ -34,7 +34,6 @@ class Listener extends Actor {
     if (hasLeftOver) {
       handleNextLine(lines, 0, lines.length - 1)
       leftOver = lines.last
-      Pretty.magenta("Got a partial string")
     } else {
       handleNextLine(lines, 0, lines.length)
     }
@@ -47,7 +46,6 @@ class Listener extends Actor {
     if (leftOver.isEmpty) {
       processLine(line)
     } else {
-      Pretty.magenta("Handling a partial string")
       processLine(leftOver + line)
       leftOver = ""
     }
