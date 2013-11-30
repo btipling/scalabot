@@ -9,16 +9,25 @@ import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.util.ByteString
 
+object Listener {
+  class QuitNetwork(val connectionId : Int) {}
+}
+
 
 class Listener extends Actor {
   private var connection : ActorRef = _
   private var leftOver : String = ""
   private var networkConfig : config.Config.Network = _
   private val networkState : NetworkState = new NetworkState()
+  private var connectionId : Int = -1
   def receive = {
     case "failed" => Pretty.red("IRC connection failed.")
     case buffer : ByteString => handleBuffer(buffer.utf8String)
     case conf : config.Config.Network => networkConfig = conf
+    case id : Int => connectionId = id
+  }
+  def quit () {
+    context.parent ! new Listener.QuitNetwork(connectionId)
   }
   def handleBuffer (buffer: String) {
     if (buffer.isEmpty) {
@@ -55,6 +64,9 @@ class Listener extends Actor {
     // Removes \r
     val line = rawLine.substring(0, rawLine.length - 1)
     Pretty.blue(line)
-    Handler.handle(line, connection, networkConfig, networkState)
+    Handler.handle(line, connection, networkConfig, networkState) match {
+      case _ : Message.QuitMessage => quit()
+      case _ => {}
+    }
   }
 }

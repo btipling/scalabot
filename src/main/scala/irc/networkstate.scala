@@ -5,4 +5,5 @@ package irc
 class NetworkState {
   var connected : Boolean = false
   var joined : Boolean = false
+  var nick: String = ""
 }

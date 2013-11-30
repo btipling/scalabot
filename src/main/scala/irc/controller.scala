@@ -17,19 +17,22 @@ class Controller extends Actor {
   private val connections : mutable.Map[Int, ConnectionState] = mutable.Map.empty[Int, ConnectionState]
   private var idGenerator : Int = 0
   class ConnectionState (
-    ircConnection : ActorRef,
-    ircListener : ActorRef,
-    networkConfig : config.Config.Network,
-    id : Int) {
+    val ircConnection : ActorRef,
+    val ircListener : ActorRef,
+    val networkConfig : config.Config.Network,
+    var connected : Boolean,
+    val id : Int) {
   }
   def receive = {
-    case network : config.Config.Network => {
-      val name = network.name
-      Pretty.blue(s"Setting up network: $name")
-      val (ircListener, ircConnection) = createConnection(network)
-      bindConnection(ircListener, ircConnection, network)
-    }
+    case network : config.Config.Network => setupNetwork(network)
+    case quitNet : Listener.QuitNetwork => quitNetwork(quitNet)
     case _ => Pretty.yellow("Controller got something unexpected.")
+  }
+  def setupNetwork(network : config.Config.Network) {
+    val name = network.name
+    Pretty.blue(s"Setting up network: $name")
+    val (ircListener, ircConnection) = createConnection(network)
+    bindConnection(ircListener, ircConnection, network)
   }
   def createConnection(network : config.Config.Network) = {
     val server = network.servers(0)
@@ -42,13 +45,24 @@ class Controller extends Actor {
       ircListener), name = "ircConnection")
     (ircListener, ircConnection)
   }
-  def bindConnection(ircListener : ActorRef, ircConnection : ActorRef, conf : config.Config.Network) {
-      connections(idGenerator) = new ConnectionState(
-        ircListener = ircListener,
-        ircConnection = ircConnection,
-        networkConfig = conf,
-        id = idGenerator
-      )
-      idGenerator += 1
+  def bindConnection(ircListener : ActorRef, ircConnection : ActorRef,
+      conf : config.Config.Network) {
+    val id = idGenerator
+    idGenerator += 1
+    connections(id) = new ConnectionState(
+      ircListener = ircListener,
+      ircConnection = ircConnection,
+      networkConfig = conf,
+      connected = true,
+      id = id
+    )
+    ircListener ! id
+  }
+  def quitNetwork(quitNet : Listener.QuitNetwork) {
+    val id = quitNet.connectionId
+    Pretty.yellow("Got a quit message!")
+    val state = connections(id)
+    state.connected = false
+    state.ircConnection ! "close"
   }
 }

@@ -46,7 +46,7 @@ class Connection(remote: InetSocketAddress, listener: ActorRef) extends Actor {
           listener ! data
         }
         case "close" => {
-          Pretty.yellow(s"Closed conection to $host.")
+          Pretty.yellow(s"Requested conection to $host be closed.")
           connection ! Close
         }
         case _: ConnectionClosed => {
