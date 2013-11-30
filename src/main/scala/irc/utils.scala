@@ -13,8 +13,10 @@ object Utils {
     override def toString : String = {
       if (value.isEmpty) {
         s"$action $key \r\n"
+      } else if (key.isEmpty) {
+        s"$action :$value \r\n"
       } else {
-        s"$action $key : $value \r\n"
+        s"$action $key :$value \r\n"
       }
     }
     def toByteString : ByteString = {

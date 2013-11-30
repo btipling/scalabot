@@ -46,6 +46,7 @@ object Handler {
       }
       case quitMessage: Message.QuitMessage => {
         if (quitMessage.validate(networkConfig)) {
+          Utils.send(sender, new Utils.OutgoingMessage("QUIT", "", "Scalabot"))
           return quitMessage
         }
         null

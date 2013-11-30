@@ -11,6 +11,7 @@ import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Props
+import akka.actor.Terminated
 
 
 class Controller extends Actor {
@@ -24,6 +25,7 @@ class Controller extends Actor {
     val id : Int) {
   }
   def receive = {
+    case Terminated(ircConnection) => handleTermination(ircConnection)
     case network : config.Config.Network => setupNetwork(network)
     case quitNet : Listener.QuitNetwork => quitNetwork(quitNet)
     case _ => Pretty.yellow("Controller got something unexpected.")
@@ -39,7 +41,7 @@ class Controller extends Actor {
     val address = new InetSocketAddress(server.host, server.port)
     Pretty.blue(s"Connecting to $address")
     val ircListener = context.actorOf(Props[Listener],
-      name = "ircListener")
+      name = "ircListener:" + idGenerator.toString)
     ircListener ! network
     val ircConnection = context.actorOf(Connection.props(address,
       ircListener), name = "ircConnection")
@@ -57,12 +59,38 @@ class Controller extends Actor {
       id = id
     )
     ircListener ! id
+    context.watch(ircConnection)
   }
   def quitNetwork(quitNet : Listener.QuitNetwork) {
     val id = quitNet.connectionId
-    Pretty.yellow("Got a quit message!")
+    Pretty.yellow("Got a quit from client!")
     val state = connections(id)
     state.connected = false
-    state.ircConnection ! "close"
+  }
+  def handleTermination(ircConnection : ActorRef) {
+    var foundConnection : ConnectionState = null
+    var count : Int = 0
+    Pretty.red("Handling termination.")
+    connections.foreach { keyval => {
+      val currentConnection = keyval._2
+      if (currentConnection.ircConnection == ircConnection) {
+        foundConnection = currentConnection
+      }
+      count += 1
+    }}
+    if (foundConnection != null) {
+      context stop foundConnection.ircListener
+      connections -= foundConnection.id
+      if (foundConnection.connected) {
+        Pretty.green("Reconnecting...")
+        createConnection(foundConnection.networkConfig)
+      } else {
+        Pretty.red("Staying dead.")
+        if (count == 1) {
+          Pretty.red("Exiting.")
+          context.system.shutdown
+        }
+      }
+    }
   }
 }
