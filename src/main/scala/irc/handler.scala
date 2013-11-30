@@ -44,10 +44,9 @@ object Handler {
       case privateMessage: Message.PrivateMessage => {
         privateMessage
       }
-      case quitMessage: Message.QuitMessage => {
-        if (quitMessage.validate(networkConfig)) {
-          Utils.send(sender, new Utils.OutgoingMessage("QUIT", "", "Scalabot"))
-          return quitMessage
+      case adminMessage: Message.AdminMessage => {
+        if (adminMessage.validate(networkConfig)) {
+          return adminMessage.perform(sender)
         }
         null
       }

@@ -5,6 +5,8 @@ package irc
 import scalabot.config
 import scalabot.pretty.Pretty
 
+import akka.actor.ActorRef
+
 object Message {
 
   val ServerMessageExpression = "^:(\\S+) (\\d+) (\\S+) :([\\S| ]*)$".r
@@ -61,6 +63,8 @@ object Message {
   ) extends IncomingMessage {
     val nickExpression = (s"$myNick: ([\\S| ]*)" + "$").r
     val quitExpression = "quit (\\S+)$".r
+    val joinExpression = "join (\\S+) (\\S+)$".r
+    val partExpression = "part (\\S+) (\\S+)$".r
     def parse () : IncomingMessage = {
       var checkMessage = message
       if (target != myNick) {
@@ -77,6 +81,12 @@ object Message {
         case quitExpression(password) => {
           new QuitMessage(password)
         }
+        case joinExpression(channel, password) => {
+          new JoinMessage(channel, password)
+        }
+        case partExpression(channel, password) => {
+          new PartMessage(channel, password)
+        }
         case _ => {
           this
         }
@@ -84,17 +94,47 @@ object Message {
     }
   }
 
-  class AdminMessage(
-    password: String
+  case class AdminMessage(
+    password : String
   ) extends IncomingMessage {
     def validate (networkConfig : config.Config.Network) : Boolean = {
       val adminPassword = networkConfig.adminPassword
-      password == networkConfig.adminPassword
+      password == adminPassword
+    }
+    protected def perform_ (sender : ActorRef) {
+    }
+    def perform (sender : ActorRef) : IncomingMessage = {
+      perform_(sender)
+      this
     }
   }
 
-  case class QuitMessage(
-    password: String
-  ) extends AdminMessage(password) {}
+  class QuitMessage(
+    password : String
+  ) extends AdminMessage(password) {
+    override def perform_ (sender : ActorRef) = {
+      Utils.send(sender, new Utils.OutgoingMessage("QUIT", "", "Scalabot"))
+    }
+  }
+
+  class JoinMessage(
+    channel: String,
+    password : String
+  ) extends AdminMessage(password) {
+    override def perform_ (sender : ActorRef) {
+      Pretty.yellow(s"joining $channel")
+      Utils.send(sender, new Utils.OutgoingMessage("JOIN", channel))
+    }
+  }
+
+  class PartMessage(
+    channel: String,
+    password : String
+  ) extends AdminMessage(password) {
+    override def perform_ (sender : ActorRef) {
+      Pretty.yellow(s"parting $channel")
+      Utils.send(sender, new Utils.OutgoingMessage("PART", channel))
+    }
+  }
 
 }
