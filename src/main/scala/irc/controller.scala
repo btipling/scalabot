@@ -15,19 +15,39 @@ import akka.actor.Terminated
 
 
 class Controller extends Actor {
-  private val connections : mutable.Map[Int, ConnectionState] = mutable.Map.empty[Int, ConnectionState]
+
+  private val ircConnections : mutable.Map[
+    Int,
+    IRCConnectionState
+  ] = mutable.Map.empty[Int, IRCConnectionState]
+
+  private val flooConnections : mutable.Map[
+    String,
+    FlooConnectionState
+  ] = mutable.Map.empty[String, FlooConnectionState]
+
   private var idGenerator : Int = 0
-  class ConnectionState (
+  class IRCConnectionState (
     val ircConnection : ActorRef,
     val ircListener : ActorRef,
     val networkConfig : config.Config.Network,
     var connected : Boolean,
     val id : Int) {
   }
+  class FlooConnectionState (
+    val url : String,
+    val host : String,
+    val owner : String,
+    val room : String,
+    val secure : Boolean,
+    val flooConnection : ActorRef,
+    var subscriptions : Vector[Int]
+  ) {}
   def receive = {
     case Terminated(ircConnection) => handleTermination(ircConnection)
     case network : config.Config.Network => setupNetwork(network)
     case quitNet : Listener.QuitNetwork => quitNetwork(quitNet)
+    case flooSubscribe : Listener.FlooSubscribe => subscribe(flooSubscribe)
     case _ => Pretty.yellow("Controller got something unexpected.")
   }
   def setupNetwork(network : config.Config.Network) {
@@ -51,7 +71,7 @@ class Controller extends Actor {
       conf : config.Config.Network) {
     val id = idGenerator
     idGenerator += 1
-    connections(id) = new ConnectionState(
+    ircConnections(id) = new IRCConnectionState(
       ircListener = ircListener,
       ircConnection = ircConnection,
       networkConfig = conf,
@@ -64,14 +84,17 @@ class Controller extends Actor {
   def quitNetwork(quitNet : Listener.QuitNetwork) {
     val id = quitNet.connectionId
     Pretty.yellow("Got a quit from client!")
-    val state = connections(id)
+    val state = ircConnections(id)
     state.connected = false
   }
+  def subscribe(flooSubscribe : Listener.FlooSubscribe) {
+    Pretty.magenta(s"Got a floo subscribe $flooSubscribe")
+  }
   def handleTermination(ircConnection : ActorRef) {
-    var foundConnection : ConnectionState = null
+    var foundConnection : IRCConnectionState = null
     var count : Int = 0
     Pretty.red("Handling termination.")
-    connections.foreach { keyval => {
+    ircConnections.foreach { keyval => {
       val currentConnection = keyval._2
       if (currentConnection.ircConnection == ircConnection) {
         foundConnection = currentConnection
@@ -80,7 +103,7 @@ class Controller extends Actor {
     }}
     if (foundConnection != null) {
       context stop foundConnection.ircListener
-      connections -= foundConnection.id
+      ircConnections -= foundConnection.id
       if (foundConnection.connected) {
         Pretty.green("Reconnecting...")
         createConnection(foundConnection.networkConfig)

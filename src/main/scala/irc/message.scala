@@ -65,6 +65,7 @@ object Message {
     val quitExpression = "quit (\\S+)$".r
     val joinExpression = "join (\\S+) (\\S+)$".r
     val partExpression = "part (\\S+) (\\S+)$".r
+    val subscripeExpression = "subscribe ((https?)://(\\S+)/(\\S+)/(\\S+))/$".r
     def parse () : IncomingMessage = {
       var checkMessage = message
       if (target != myNick) {
@@ -87,12 +88,23 @@ object Message {
         case partExpression(channel, password) => {
           new PartMessage(channel, password)
         }
+        case subscripeExpression(url, protocol, host, owner, room) => {
+          new FlooSubscribeMessage(url, protocol, host, owner, room)
+        }
         case _ => {
           this
         }
       }
     }
   }
+
+  case class FlooSubscribeMessage(
+    url : String,
+    protocol : String,
+    host : String,
+    owner : String,
+    rooom : String
+  ) extends IncomingMessage {}
 
   case class AdminMessage(
     password : String

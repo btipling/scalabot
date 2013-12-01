@@ -10,7 +10,11 @@ import akka.actor.ActorRef
 import akka.util.ByteString
 
 object Listener {
-  class QuitNetwork(val connectionId : Int) {}
+  case class QuitNetwork(val connectionId : Int) {}
+  case class FlooSubscribe(
+    val flooSubscribeMessage : Message.FlooSubscribeMessage,
+    val connectionId : Int
+  ) {}
 }
 
 
@@ -65,6 +69,12 @@ class Listener extends Actor {
     val line = rawLine.substring(0, rawLine.length - 1)
     Pretty.blue(line)
     Handler.handle(line, connection, networkConfig, networkState) match {
+      case flooSubscribeMessage : Message.FlooSubscribeMessage => {
+        context.parent ! new Listener.FlooSubscribe(
+          flooSubscribeMessage = flooSubscribeMessage,
+          connectionId = connectionId
+        )
+      }
       case _ : Message.QuitMessage => quit()
       case _ => {}
     }
