@@ -20,6 +20,7 @@ object Config {
   case class Network (
     name: String,
     nick: String,
+    ssl: Boolean,
     altNick: String,
     adminPassword: String,
     servers: Array[Server],
@@ -38,6 +39,10 @@ object Config {
 
   def jsString(data: argonaut.JsonObject, key: String) : String = {
     data(key).get.string.get
+  }
+
+  def jsBoolean(data: argonaut.JsonObject, key: String) : Boolean = {
+    data(key).get.bool.get
   }
 
   def jsArray(data: argonaut.JsonObject, key: String) : Array[String] = {
@@ -88,6 +93,7 @@ object Config {
         name = jsString(networkData, "name"),
         nick = jsString(networkData, "nick"),
         altNick = jsString(networkData, "altNick"),
+        ssl = jsBoolean(networkData, "ssl"),
         adminPassword = adminPassword,
         servers = servers.toArray,
         channels = jsArray(networkData, "channels"),

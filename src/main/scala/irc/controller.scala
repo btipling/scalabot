@@ -64,7 +64,7 @@ class Controller extends Actor {
       name = "ircListener:" + idGenerator.toString)
     ircListener ! network
     val ircConnection = context.actorOf(Connection.props(address,
-      ircListener), name = "ircConnection")
+      network.ssl, ircListener), name = "ircConnection")
     (ircListener, ircConnection)
   }
   def bindConnection(ircListener : ActorRef, ircConnection : ActorRef,

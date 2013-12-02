@@ -4,22 +4,25 @@
   "networks": [
     {
       "name": "freenode",
+      "nick": "scala_bot",
+      "altNick": "scala_bot_",
+      "ssl": true,
       "servers": [
         {
           "host": "chat.freenode.net",
           "port": 6667
         }
       ],
-      "nick": "scala_bot",
-      "altNick": "scala_bot_",
       "channels": [
-        "#scalabot"
+        "#scala_bot",
+        "#botwar",
+        "#flood"
       ],
       "performs": [
         {
           "action": "PRIVMSG",
           "target": "nickserv",
-          "messages": "identify scala_bot test1234"
+          "message": "identify scala_bot test1234"
         }
       ]
     }
